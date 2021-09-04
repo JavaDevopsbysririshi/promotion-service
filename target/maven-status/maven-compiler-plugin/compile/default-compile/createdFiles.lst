@@ -1,0 +1,8 @@
+com\meru\ecommerce\promo\promotionservice\dao\PromotionRepository.class
+com\meru\ecommerce\promo\promotionservice\entity\ProductDescription.class
+com\meru\ecommerce\promo\promotionservice\service\PromotionServiceImpl.class
+com\meru\ecommerce\promo\promotionservice\entity\Promotion.class
+com\meru\ecommerce\promo\promotionservice\PromotionServiceApplication.class
+com\meru\ecommerce\promo\promotionservice\entity\Product.class
+com\meru\ecommerce\promo\promotionservice\web\PromotionController.class
+com\meru\ecommerce\promo\promotionservice\service\PromotionService.class

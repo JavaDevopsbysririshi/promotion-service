@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1"/>
+<title>Inventory List</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
+
+</head>
+<body>
+<h1>PROMOTIONS</h1>
+<table class="table table-striped">
+<tr>
+<th>PROMO ID</th>
+<th>PRODUCT ID</th>
+<th>PRODUCT NAME</th>
+<th>PROMO CODE</th>
+<th>PROMO DESCRIPTION</th>
+<th>PROMO STARTDATE</th>
+<th>PROMO ENDDATE</th>
+<th>PROMO VALUE</th>
+<th>ACTIONS</th>
+
+</tr>
+<tr th:each="promotion:${promotion}">
+<td th:utext="${promotion.promoId}"></td>
+<td th:utext="${promotion.productId}"></td>
+<td th:utext="${promotion.productName}"></td>
+<td th:utext="${promotion.promoCode}"></td>
+<td th:utext="${promotion.promoDescription}"></td>
+<td th:utext="${promotion.promoStartDate}"></td>
+<td th:utext="${promotion.promoEndDate}"></td>
+<td th:utext="${promotion.promoValue}"></td>
+<td><a th:href="@{/delete/{promoId}(promoId=${promotion.promoId})}" class="btn btn-danger">DELETE</a></td>
+</tr>
+</table>
+
+
+
+<a href="/add" class="btn btn-success">ADD PROMOTION</a>
+<a href="/search" class="btn btn-success">SEARCH PROMOTION</a>
+
+</body>
+</html>
