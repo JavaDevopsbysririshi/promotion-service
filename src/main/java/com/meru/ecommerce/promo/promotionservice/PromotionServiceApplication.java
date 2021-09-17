@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 //@EnableDiscoveryClient
 public class PromotionServiceApplication {
+private PromotionServiceApplication {() {}
 
 	public static void main(String[] args) {
 		SpringApplication.run(PromotionServiceApplication.class, args);
