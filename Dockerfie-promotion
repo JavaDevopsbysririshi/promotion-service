@@ -1,0 +1,9 @@
+FROM openjdk
+ENV APP_HOME=target/*.jar
+#WORKDIR $APP_HOME
+COPY ${APP_HOME} promotion.jar
+EXPOSE 7075
+CMD ["java", "-jar","/promotion.jar"]
+
+#docker build command
+# docker build -f Dockerfile -t promotion .
