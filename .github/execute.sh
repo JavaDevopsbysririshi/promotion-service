@@ -137,4 +137,26 @@ find . -type f -name "*.hcl" | while read -r file; do
     fi
 done > github_urls.txt
 
+===============================================
+
+
+#!/bin/bash
+
+# Check if a directory is provided as an argument
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <directory>"
+  exit 1
+fi
+
+# Store the directory name in a variable
+directory="$1"
+
+# Use a loop to search for and retrieve lines containing 'source = *' in all .hcl files
+for file in "$directory"/*.hcl; do
+  if [ -f "$file" ]; then
+    echo "Searching in $file:"
+    awk '/source = .*/' "$file"
+    echo "-----------------------------"
+  fi
+done
 
