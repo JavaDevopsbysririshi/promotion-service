@@ -1,40 +1,95 @@
-Certainly! Let's break down the detailed flow from GCP to infrastructure building using GitHub Actions, self-hosted runners, and Terraform scripts:
 
-Google Cloud Platform (GCP):
 
-This is your cloud infrastructure provider. You will create and manage resources like virtual machines (VMs), databases, and other services in GCP.
-GCP VM:
+what is the output 
+TERRAGRUNT_CMD+="$TG_WORKDIR"
+echo "$TERRAGRUNT_CMD"
 
-You have a virtual machine (VM) hosted on Google Cloud Platform where you intend to run your self-hosted GitHub Actions runner.
-Self-Hosted Runner + Script + GitHub Runner Unique Token:
 
-You set up a self-hosted GitHub Actions runner on the GCP VM.
-To authenticate and connect this runner to GitHub, you generate a unique token (registration token) from your GitHub repository settings. This token is used to authenticate the runner during the registration process.
-Runner Container:
+#!/bin/bash
 
-You may use a containerization technology like Docker to encapsulate the runner setup and dependencies. This container will run the self-hosted GitHub Actions runner.
-GitHub Self-Hosted Runner:
+# Check if this is a pull request
+if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+  # Check if the pull request is merged
+  if [ "$GITHUB_EVENT_ACTION" == "closed" ] && [ "$GITHUB_EVENT_PULL_REQUEST_MERGED" == "true" ]; then
+    echo "Pull request was merged. Proceeding to apply Terraform changes..."
+    # Run Terraform apply here
+    terraform apply -auto-approve
+  else
+    echo "Pull request was not merged. Terraform apply is not required."
+  fi
+else
+  echo "This is not a pull request. Terraform apply is not required."
+fi
 
-The self-hosted runner is responsible for executing GitHub Actions workflows on your GCP VM.
-It connects to GitHub using the unique token, listens for workflow events, and runs jobs specified in your GitHub Actions workflows.
-GitHub Action YAML File:
+===================================
 
-In your GitHub repository, you define GitHub Actions workflows using YAML files (e.g., .github/workflows/main.yml).
-These workflows define the steps and jobs to execute whenever specific events occur, such as code pushes or pull requests.
-Commit Message Required Format:
 
-You may enforce a specific commit message format in your repository, ensuring consistency and clarity in your version control history. For example, you might require commit messages to include a prefix like [feature], [bugfix], or [ci].
-Shell Script:
+#!/bin/bash
 
-Within your GitHub Actions workflow, you can include shell scripts (e.g., bash scripts) to perform various tasks.
-These scripts can be used for build, test, deployment, or any other automation steps required for your project.
-Terraform Script:
+# Define the branch to monitor for merges
+target_branch="main"  # Replace with your desired branch name
 
-If your project involves infrastructure provisioning and management, you may have Terraform scripts that define your infrastructure as code (IAC).
-These scripts declare the desired state of your infrastructure resources (e.g., VMs, networks, databases) and can be used to create or update them in GCP.
-Infrastructure Building:
+# Function to check if the specified branch has been merged
+is_branch_merged() {
+  local branch_name="$1"
+  local remote_name="$2"
+  
+  # Fetch the latest changes from the remote repository
+  git fetch "$remote_name"
+  
+  # Check if the branch is merged (exit status 0 means merged)
+  git branch --list --remote "$remote_name/$branch_name" | grep "$branch_name" &> /dev/null
+}
 
-GitHub Actions workflows can trigger Terraform scripts to create or update infrastructure in your GCP account.
-This step automates the provisioning of cloud resources according to your Terraform configurations.
-Any necessary configuration parameters or secrets can be passed securely to Terraform using GitHub Secrets or environment variables.
-In summary, this flow describes how you use GitHub Actions, self-hosted runners, and Terraform to automate the deployment and management of resources on Google Cloud Platform. GitHub Actions workflows are used to define the automation steps, and self-hosted runners execute these workflows on a GCP VM, interacting with GCP resources and running scripts as needed to achieve your project's goals.
+# Check if the target branch has been merged
+if is_branch_merged "$target_branch" "origin"; then
+  echo "The $target_branch branch has been merged. Proceeding with Terraform apply..."
+  
+  # Run Terraform apply here
+  terraform apply -auto-approve
+else
+  echo "The $target_branch branch has not been merged. Terraform apply is not required."
+fi
+=========================
+
+
+#!/bin/bash
+
+# Define the branch to monitor for merges
+target_branch="main"  # Replace with your desired branch name
+
+# Function to check if the specified branch has been merged
+is_branch_merged() {
+  local branch_name="$1"
+  local remote_name="$2"
+  
+  # Fetch the latest changes from the remote repository
+  git fetch "$remote_name"
+  
+  # Check if the branch is merged (exit status 0 means merged)
+  git branch --list --remote "$remote_name/$branch_name" | grep "$branch_name" &> /dev/null
+}
+
+# Function to apply Terraform changes and print the list of changed files
+apply_terraform_and_print_changes() {
+  # Apply Terraform changes
+  terraform apply -auto-approve
+  
+  # Get the list of changed files
+  changed_files=$(git diff --name-only)
+  
+  # Print the list of changed files and count
+  echo "Changed files:"
+  echo "$changed_files"
+  echo "Total changes: $(echo "$changed_files" | wc -l)"
+}
+
+# Check if the target branch has been merged
+if is_branch_merged "$target_branch" "origin"; then
+  echo "The $target_branch branch has been merged. Proceeding with Terraform apply..."
+  
+  # Run Terraform apply and print changes
+  apply_terraform_and_print_changes
+else
+  echo "The $target_branch branch has not been merged. Terraform apply is not required."
+fi
