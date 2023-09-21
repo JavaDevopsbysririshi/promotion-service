@@ -149,3 +149,41 @@ jobs:
           for path in "${absolute_paths[@]}"; do
             echo "$path"
           done
+================================================
+
+name: Check Changed Files
+
+on:
+  pull_request:
+    paths:
+      - '**/*'
+
+jobs:
+  check_changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: List changed files
+        id: changed-files
+        run: |
+          # Get the base and head commits for the pull request
+          base_commit=$(curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}" | jq -r '.base.sha')
+          head_commit=$(curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}" | jq -r '.head.sha')
+
+          # List changed files between the base and head commits
+          changed_files=$(git diff --name-only "$base_commit" "$head_commit")
+
+          echo "::set-output name=files::${changed_files}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Display changed files
+        run: |
+          changed_files="${{ steps.changed-files.outputs.files }}"
+          echo "Changed files:"
+          echo "$changed_files"
+
+# Add any further steps or actions you need to perform based on the changed files.
