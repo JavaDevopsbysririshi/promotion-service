@@ -102,3 +102,50 @@ if is_branch_merged "$target_branch" "origin"; then
 else
   echo "The $target_branch branch has not been merged. Terraform apply is not required."
 fi
+====================================
+
+
+name: Get Absolute Paths of Changed Files
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  get_changed_files:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: List changed files
+        id: changed-files
+        run: |
+          # Fetch all branches to get the latest changes
+          git fetch origin "+refs/heads/*:refs/remotes/origin/*"
+          
+          # Get the latest commit in the default branch (usually 'main' or 'master')
+          default_branch_commit=$(git rev-parse origin/main) # Change 'main' to your default branch name if needed
+
+          # List changed files between the default branch and the current branch
+          changed_files=$(git diff --name-only "$default_branch_commit")
+
+          echo "::set-output name=files::${changed_files}"
+
+      - name: Display absolute paths of changed files
+        run: |
+          changed_files="${{ steps.changed-files.outputs.files }}"
+          absolute_paths=()
+
+          # Iterate over changed files and get their absolute paths
+          for file in $changed_files; do
+            absolute_path=$(realpath "$file")
+            absolute_paths+=("$absolute_path")
+          done
+
+          echo "Absolute paths of changed files:"
+          for path in "${absolute_paths[@]}"; do
+            echo "$path"
+          done
